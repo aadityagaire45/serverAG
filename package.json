@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+		"deploy-and-tail": "wrangler deploy && wrangler tail",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

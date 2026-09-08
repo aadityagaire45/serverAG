@@ -36,6 +36,12 @@ export const verifyWebhook = (c: Context) => {
 	}
 };
 
+// --- post
+// --- 1-2s received. 200
+// --- cloudflare queue. -> process this req.
+// 	--- generates a new worker to work on this task.
+// --- end
+
 export const processUserQuery = async (c: Context) => {
 	try {
 		const { userQuery, messageId, phoneNumberId, fromNumber } = await extractUserQuery(c);
@@ -47,11 +53,21 @@ export const processUserQuery = async (c: Context) => {
 		const json = await c.req.json();
 		console.log(JSON.stringify(json, null, 2));
 
+		console.log("Processed", {
+			userQuery,
+			messageId,
+			phoneNumberId,
+			fromNumber,
+		});
+
+		// TODO: Implement cloudflare queue worker
 		c.executionCtx.waitUntil(
 			(async () => {
 				sendTypingIndicator({ c, messageId, phoneNumberId });
 
 				const userQueryEmbedding = await new Embedder().embed(userQuery);
+				console.log(JSON.stringify(userQueryEmbedding, null, 2));
+
 				if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
 
 				// might wanna change the loading text here if possible.
@@ -60,8 +76,11 @@ export const processUserQuery = async (c: Context) => {
 						embedding: userQueryEmbedding,
 					})) ?? [];
 
+				console.log(JSON.stringify(relevantRecords, null, 2));
+
 				// might wanna change the loading text here if possible.
 				const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
+				console.log(JSON.stringify(llmResponse, null, 2));
 
 				if (!llmResponse)
 					return c.text("Something went wrong while generating response from llm", 500);
