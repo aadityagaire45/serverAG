@@ -11,19 +11,16 @@ export const getRelevantDBRecords = async ({
 	topK?: number;
 }) => {
 	try {
+		const vectorParam = sql`vector32(${JSON.stringify(embedding)})`;
 		const records = await db
 			.select({
 				document_title: knw_sources.title,
 				link: knw_sources.link,
 				description: knw_sources.description,
 				id: knw_sources.id,
-
 				content: pknw_base.content,
-				distance: sql<number>`vt.distance`,
 			})
-			.from(
-				sql`vector_top_k('embedding_idx', vector32(${JSON.stringify(embedding)}), ${topK}) as vt`,
-			)
+			.from(sql`vector_top_k('embedding_idx', ${vectorParam}, ${topK}) as vt`)
 			.innerJoin(pknw_base, sql`${pknw_base.id} = vt.id`)
 			.innerJoin(knw_sources, eq(pknw_base.source, knw_sources.id));
 

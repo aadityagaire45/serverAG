@@ -51,24 +51,25 @@ export const processUserQuery = async (c: Context) => {
 			(async () => {
 				sendTypingIndicator({ c, messageId, phoneNumberId });
 
-				// const userQueryEmbedding = await new Embedder().embed(userQuery);
-				// if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
+				const userQueryEmbedding = await new Embedder().embed(userQuery);
+				if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
 
 				// might wanna change the loading text here if possible.
-				// const relevantRecords =
-				// 	(await getRelevantDBRecords({
-				// 		embedding: userQueryEmbedding,
-				// 	})) ?? [];
+				const relevantRecords =
+					(await getRelevantDBRecords({
+						embedding: userQueryEmbedding,
+					})) ?? [];
 
-				// // might wanna change the loading text here if possible.
-				// const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
-				// if (!llmResponse)
-				// 	return c.text("Something went wrong while generating response from llm", 500);
-				//
+				// might wanna change the loading text here if possible.
+				const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
+
+				if (!llmResponse)
+					return c.text("Something went wrong while generating response from llm", 500);
+
 				await sendFinalResponse({
 					messageId,
 					phoneNumberId,
-					finalResponse: `Hello there! 👋\nThank you for messaging us!!! \nWe are currently in development, we have noted your query and will respond as soon as we get fully integrated.`,
+					finalResponse: llmResponse,
 					phoneNumber: fromNumber,
 					c,
 				});

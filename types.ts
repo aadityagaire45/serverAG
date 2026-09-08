@@ -57,5 +57,5 @@ export type TEnv = {
 	META_WP_API_VERIFICATION_TOKEN: string;
 	ACCESS_TOKEN: string;
 	HF_TOKEN: string;
-	GEMINI_API_KEY: string;
+	GOOGLE_GENERATIVE_AI_API_KEY: string;
 };

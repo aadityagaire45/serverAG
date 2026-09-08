@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.64",
